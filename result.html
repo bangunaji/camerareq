@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result</title>
+</head>
+
+<body>
+    <h1>Photo Result</h1>
+    <div id="photo-result"></div>
+    <script>
+        function getQueryParams() {
+            const params = {};
+            const queryString = window.location.search.substring(1);
+            const queryArray = queryString.split('&');
+
+            queryArray.forEach(function (param) {
+                const pair = param.split('=');
+                params[pair[0]] = decodeURIComponent(pair[1]);
+            });
+
+            return params;
+        }
+
+        window.onload = function () {
+            const params = getQueryParams();
+            const photoData = params['photo'];
+
+            if (photoData) {
+                const img = document.createElement('img');
+                img.src = photoData;
+                document.getElementById('photo-result').appendChild(img);
+            } else {
+                alert('No photo data found.');
+            }
+        }
+    </script>
+</body>
+
+</html>
